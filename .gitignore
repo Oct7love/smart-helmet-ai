@@ -1,0 +1,28 @@
+# 编译输出
+build/
+cmake-build-*/
+*.bin
+*.elf
+*.hex
+*.map
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# STM32
+*.o
+*.d
+*.su
+*.lst
+
+# ESP32
+sdkconfig.old
+dependencies.lock
+
+# 其他
+.DS_Store
+Thumbs.db

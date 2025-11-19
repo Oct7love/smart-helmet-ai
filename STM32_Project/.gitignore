@@ -1,0 +1,46 @@
+# 编译生成的文件
+build/
+cmake-build-*/
+Debug/
+Release/
+
+# CMake 生成的文件
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+
+# 编译输出文件
+*.o
+*.obj
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.su
+
+# IDE 相关文件
+.vscode/
+.idea/
+*.code-workspace
+
+# Windows 相关
+Thumbs.db
+Desktop.ini
+nul
+
+# macOS 相关
+.DS_Store
+
+# 临时文件
+*.swp
+*.swo
+*~
+*.tmp
+*.bak
+
+# 用户配置（如果有的话）
+*.user
