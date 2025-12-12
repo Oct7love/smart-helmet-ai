@@ -106,7 +106,7 @@ int main(void)
   // 初始化延时函数
   ringbuffer_init(&usart_rb);  // ✅ 加这一行
   delay_init();
-  
+
   OLED_Init();
   // printf("OLED Init OK\r\n");
 
@@ -164,39 +164,119 @@ int main(void)
 
   while (1)
   {
-    // 运行任务调度器（GPS任务会在这里执行）
+    // 运行任务调度器
     scheduler_run();
 
-    // ==================== OLED 显示 GPS 数据 ====================
+    // ==================== OLED 多页面显示 ====================
     OLED_Clear();  // 清空缓冲区
 
-    // // 第1行: GPS标题和定位状态
-    // OLED_ShowString(1, 1, "GPS:");
-    // if (gps_data.gps_quality == 1)
-    // {
-    //     OLED_ShowString(1, 5, "OK ");  // 定位成功
-    // }
-    // else
-    // {
-    //     OLED_ShowString(1, 5, "X ");   // 定位失败
-    // }
-    // // 第1行后半部分: 卫星数
-    // OLED_ShowString(1, 8, "SAT:");
-    // OLED_ShowNum(1, 12, gps_data.num_satellites, 2);
-    // // 第2行: 纬度 (北/南纬)
-    // OLED_ShowString(2, 1, "Lat:");
-    // OLED_ShowFloat(2, 5, gps_data.latitude, 2, 4);  // 显示2位整数,4位小数
-    // OLED_ShowChar(2, 16, gps_data.lat_dir);
-    // // 第3行: 经度 (东/西经)
-    // OLED_ShowString(3, 1, "Lon:");
-    // OLED_ShowFloat(3, 5, gps_data.longitude, 3, 4); // 显示3位整数,4位小数
-    // OLED_ShowChar(3, 16, gps_data.lon_dir);
-    // // 第4行: HDOP和高度
-    // OLED_ShowString(4, 1, "H:");
-    // OLED_ShowFloat(4, 3, gps_data.hdop, 1, 1);
-    // OLED_ShowString(4, 6, " Alt:");
-    // OLED_ShowNum(4, 11, (uint32_t)gps_data.altitude, 3);
-    // OLED_ShowChar(4, 16, 'm');
+    // 根据当前选中的传感器显示不同内容
+    switch (current_selected_sensor) {
+      case SENSOR_HR:
+        // 心率血氧页面
+        OLED_ShowString(1, 1, "[HR]");
+        OLED_ShowString(1, 6, heart_rate_enabled ? "ON " : "OFF");
+
+        if (heart_rate_enabled) {
+          OLED_ShowString(2, 1, "HR:");
+          OLED_ShowNum(2, 5, (uint32_t)max30102_data.heart_rate, 3);
+          OLED_ShowString(2, 9, "bpm");
+
+          OLED_ShowString(3, 1, "SpO2:");
+          OLED_ShowNum(3, 7, (uint32_t)max30102_data.spo2, 3);
+          OLED_ShowChar(3, 10, '%');
+        } else {
+          OLED_ShowString(3, 1, "Press KEY1");
+          OLED_ShowString(4, 1, "to START");
+        }
+        break;
+
+      case SENSOR_TEMP:
+        // 温湿度页面
+        OLED_ShowString(1, 1, "[TEMP]");
+        OLED_ShowString(1, 7, temperature_enabled ? "ON " : "OFF");
+
+        if (temperature_enabled) {
+          OLED_ShowString(2, 1, "Temp:");
+          OLED_ShowNum(2, 7, dht11_data.temperature, 2);
+          OLED_ShowString(2, 9, "C");
+
+          OLED_ShowString(3, 1, "Humi:");
+          OLED_ShowNum(3, 7, dht11_data.humidity, 2);
+          OLED_ShowString(3, 9, "%");
+        } else {
+          OLED_ShowString(3, 1, "Press KEY1");
+          OLED_ShowString(4, 1, "to START");
+        }
+        break;
+
+      case SENSOR_MPU:
+        // 姿态检测页面
+        OLED_ShowString(1, 1, "[MPU]");
+        OLED_ShowString(1, 6, mpu6050_enabled ? "ON " : "OFF");
+
+        if (mpu6050_enabled) {
+          OLED_ShowString(2, 1, "Pitch:");
+          OLED_ShowFloat(2, 7, mpu6050_data.pitch, 3, 1);
+
+          OLED_ShowString(3, 1, "Roll:");
+          OLED_ShowFloat(3, 7, mpu6050_data.roll, 3, 1);
+
+          OLED_ShowString(4, 1, "Steps:");
+          OLED_ShowNum(4, 8, mpu6050_data.step_count, 4);
+        } else {
+          OLED_ShowString(3, 1, "Press KEY1");
+          OLED_ShowString(4, 1, "to START");
+        }
+        break;
+
+      case SENSOR_MQ2:
+        // 烟雾检测页面
+        OLED_ShowString(1, 1, "[MQ2]");
+        OLED_ShowString(1, 6, mq2_enabled ? "ON " : "OFF");
+
+        if (mq2_enabled) {
+          OLED_ShowString(2, 1, "PPM:");
+          OLED_ShowFloat(2, 6, mq2_data.ppm, 4, 1);
+
+          OLED_ShowString(3, 1, "Level:");
+          OLED_ShowNum(3, 8, mq2_data.alarm, 1);
+
+          // 显示报警状态文字
+          const char* level_text[] = {"Safe", "Low", "Mid", "High"};
+          if (mq2_data.alarm < 4) {
+            OLED_ShowString(4, 1, (char*)level_text[mq2_data.alarm]);
+          }
+        } else {
+          OLED_ShowString(3, 1, "Press KEY1");
+          OLED_ShowString(4, 1, "to START");
+        }
+        break;
+
+      case SENSOR_GPS:
+        // GPS定位页面
+        OLED_ShowString(1, 1, "[GPS]");
+        OLED_ShowString(1, 6, gps_enabled ? "ON " : "OFF");
+
+        if (gps_enabled) {
+          OLED_ShowString(2, 1, "SAT:");
+          OLED_ShowNum(2, 5, gps_data.num_satellites, 2);
+
+          OLED_ShowString(3, 1, "Lat:");
+          OLED_ShowFloat(3, 5, gps_data.latitude, 2, 4);
+
+          OLED_ShowString(4, 1, "Lon:");
+          OLED_ShowFloat(4, 5, gps_data.longitude, 3, 4);
+        } else {
+          OLED_ShowString(3, 1, "Press KEY1");
+          OLED_ShowString(4, 1, "to START");
+        }
+        break;
+
+      default:
+        OLED_ShowString(2, 1, "Unknown");
+        break;
+    }
 
     // 刷新OLED显示
     OLED_Flush();

@@ -2,6 +2,7 @@
 // Created by 13615 on 2025/11/1.
 //
 #include "scheduler.h"
+#include "key_app.h"  // 按键处理模块
 
 uint8_t task_num; // 全局变量存储任务数量
 
@@ -9,7 +10,7 @@ typedef struct {
     void (*task_func)(void); // 任务函数指针
     uint32_t rate_ms; // 任务执行周期(毫秒)
     uint32_t last_run; // 上次执行时间戳
-} task_t; 
+} task_t;
 
 void led_proc() {
 
@@ -21,6 +22,7 @@ void printf_proc() {
 static task_t scheduler_task[] =
 {
     // {printf_proc,100,0},
+    {key_task,20,0},      // 按键扫描任务,20ms周期
     {mq2_task,500,0},
     {dht11_task,1000,0},  // DHT11任务,1000ms周期
     {mpu6050_task,100,0}, // MPU6050任务,100ms周期
