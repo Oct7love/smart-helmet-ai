@@ -32,7 +32,7 @@
 #include "mpu_app.h"    // MPU6050传感器驱动头文件
 #include "max30102_app.h"
 #include "gps_app.h"    // ATGM336H GPS定位模块驱动头文件
-
+#include "system_state.h"
 // ESP32通信模块
 #include "esp32_comm.h"  // ESP32串口通信模块
 

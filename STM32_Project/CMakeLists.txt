@@ -68,6 +68,9 @@ add_executable(${CMAKE_PROJECT_NAME}
         Core/Src/syscalls.c
         APP/esp32_comm.h
         APP/esp32_comm.c
+        APP/system_state.c
+        APP/system_state.h
+
 
 )  # printf重定向
 

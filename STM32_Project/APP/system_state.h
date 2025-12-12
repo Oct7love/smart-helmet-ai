@@ -19,7 +19,7 @@
 #define SYSTEM_STATE_H
 
 #include <stdint.h>
-
+#include "bsp_system.h"
 /**
  * @brief 传感器类型枚举
  */
