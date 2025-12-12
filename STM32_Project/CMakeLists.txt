@@ -70,6 +70,9 @@ add_executable(${CMAKE_PROJECT_NAME}
         APP/esp32_comm.c
         APP/system_state.c
         APP/system_state.h
+        APP/key_app.c
+        APP/key_app.h
+
 
 
 )  # printf重定向

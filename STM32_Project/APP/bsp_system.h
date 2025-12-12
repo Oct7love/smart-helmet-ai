@@ -26,6 +26,7 @@
 #include "oledfont.h"
 #include "oled.h"
 #include "ringbuffer/ringbuffer.h"
+#include "key_app.h"
 // 传感器驱动
 #include "mq2_app.h"    // 烟雾传感器驱动头文件
 #include "dht11_app.h"  // 温湿度传感器驱动头文件
